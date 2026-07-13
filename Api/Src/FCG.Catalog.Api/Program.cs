@@ -54,6 +54,8 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 
 // Query Services
 builder.Services.AddScoped<IJogoQueryService, JogoQueryService>();
+builder.Services.AddScoped<IOrdemCompraQueryService, OrdemCompraQueryService>();
+builder.Services.AddScoped<IBibliotecaQueryService, BibliotecaQueryService>();
 
 #endregion
 

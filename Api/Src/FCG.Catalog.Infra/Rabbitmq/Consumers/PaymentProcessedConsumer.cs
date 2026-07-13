@@ -24,7 +24,7 @@ public class PaymentProcessedConsumer : IConsumer<PaymentProcessedEvent>
 
         if (pagamento.Status == "Aprovado")
         {
-            await _mediator.Send(new AdicionarJogoCommand(pagamento.IdUsuario, pagamento.IdJogo));
+            await _mediator.Send(new AdicionarJogoCommand(pagamento.IdOrdemCompra, pagamento.IdUsuario, pagamento.IdJogo));
         }
     }
 }

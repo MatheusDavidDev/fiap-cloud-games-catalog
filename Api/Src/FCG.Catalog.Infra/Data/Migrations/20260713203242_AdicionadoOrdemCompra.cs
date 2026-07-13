@@ -27,7 +27,18 @@ namespace FCG.Catalog.Infra.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrdensCompra", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrdensCompra_Jogos_IdJogo",
+                        column: x => x.IdJogo,
+                        principalTable: "Jogos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrdensCompra_IdJogo",
+                table: "OrdensCompra",
+                column: "IdJogo");
         }
 
         /// <inheritdoc />

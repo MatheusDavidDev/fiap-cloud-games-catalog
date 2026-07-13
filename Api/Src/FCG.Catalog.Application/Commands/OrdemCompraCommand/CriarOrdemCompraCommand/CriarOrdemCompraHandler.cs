@@ -46,7 +46,12 @@ public class CriarOrdemCompraHandler : IRequestHandler<CriarOrdemCompraCommand>
         await _unitOfWork.SaveChanges();
 
         //Enviando evento para o serviço de pagamento
-        //await _publishEndpoint.Publish(
-        //    new OrderPlacedEvent(ordemCompra.Id, ordemCompra.IdUsuario, ordemCompra.IdJogo, ordemCompra.Valor, DateTime.UtcNow), cancellationToken);
+        await _publishEndpoint.Publish(
+            new OrderPlacedEvent(
+                ordemCompra.Id, 
+                ordemCompra.IdUsuario, 
+                ordemCompra.IdJogo, 
+                ordemCompra.Valor, 
+                DateTime.UtcNow), cancellationToken);
     }
 }

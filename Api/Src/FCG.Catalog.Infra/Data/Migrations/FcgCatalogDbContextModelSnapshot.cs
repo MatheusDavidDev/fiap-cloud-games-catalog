@@ -168,6 +168,8 @@ namespace FCG.Catalog.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IdJogo");
+
                     b.ToTable("OrdensCompra", (string)null);
                 });
 
@@ -195,6 +197,17 @@ namespace FCG.Catalog.Infra.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Biblioteca");
+
+                    b.Navigation("Jogo");
+                });
+
+            modelBuilder.Entity("FCG.Catalog.Domain.Entities.OrdemCompra", b =>
+                {
+                    b.HasOne("FCG.Catalog.Domain.Entities.Jogo", "Jogo")
+                        .WithMany()
+                        .HasForeignKey("IdJogo")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Jogo");
                 });

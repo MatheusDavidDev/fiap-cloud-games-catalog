@@ -23,6 +23,10 @@ public class AdicionarJogoHandler : IRequestHandler<AdicionarJogoCommand>
     {
         var bibliotecaRepository = _unitOfWork.GetRepository<Biblioteca>();
         var jogoRepository = _unitOfWork.GetRepository<Jogo>();
+        var ordemCompraRepository = _unitOfWork.GetRepository<OrdemCompra>();
+
+        var ordemCompra = await ordemCompraRepository.GetByAsync(
+            predicate: x => x.Id == request.IdOrdemCompra, cancellationToken: cancellationToken);
 
         var biblioteca = await bibliotecaRepository.GetByAsync(
             predicate: x => x.IdUsuario == request.IdUsuario, 
@@ -30,15 +34,8 @@ public class AdicionarJogoHandler : IRequestHandler<AdicionarJogoCommand>
 
         var jogo = await jogoRepository.GetByAsync(predicate: x => x.Id == request.IdJogo, cancellationToken: cancellationToken);
 
-
-        if (biblioteca is null)
-        {
-            biblioteca = new Biblioteca(request.IdUsuario);
-        }
-
         if (biblioteca.JogosBiblioteca.Any(x => x.IdJogo == request.IdJogo))
             throw new Exception("Jogo já adicionado à biblioteca.");
-
 
         if (jogo is null)
             throw new Exception("Jogo não existe.");

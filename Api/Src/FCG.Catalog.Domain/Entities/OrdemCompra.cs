@@ -15,6 +15,7 @@ public class OrdemCompra : BaseEntity
 
     public Guid IdUsuario { get; private set; }
     public Guid IdJogo { get; private set; }
+    public Jogo Jogo { get; private set; }
     public decimal Valor { get; private set; }
     public StatusOrdemCompra Status { get; private set; }
 

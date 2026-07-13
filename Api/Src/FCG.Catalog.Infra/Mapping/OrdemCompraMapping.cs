@@ -16,6 +16,10 @@ public class OrdemCompraMapping : IEntityTypeConfiguration<OrdemCompra>
         builder.Property(x => x.IdJogo)
             .IsRequired();
 
+        builder.HasOne(x => x.Jogo)
+           .WithMany()
+           .HasForeignKey(x => x.IdJogo);
+
         builder.Property(x => x.Valor)
             .HasPrecision(10, 2);
 
