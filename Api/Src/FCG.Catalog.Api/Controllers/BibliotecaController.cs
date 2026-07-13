@@ -1,4 +1,5 @@
 ﻿using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
+using FCG.Catalog.Application.Commands.OrdemCompraCommand.CriarOrdemCompraCommand;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,7 @@ public class BibliotecaController : ControllerBase
     [HttpPost("{id}")]
     public async Task<IActionResult> AdicionarJogo(Guid id, Guid idJogo)
     {
-        await _mediator.Send(new AdicionarJogoCommand(id, idJogo));
+        await _mediator.Send(new CriarOrdemCompraCommand(id, idJogo));
         return NoContent();
     }
 }

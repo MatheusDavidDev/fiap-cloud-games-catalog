@@ -1,12 +1,15 @@
 using FCG.Catalog.Api.Middlewares;
 using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
 using FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
+using FCG.Catalog.Application.Commands.OrdemCompraCommand.CriarOrdemCompraCommand;
 using FCG.Catalog.Application.Queries;
 using FCG.Catalog.Core.Behaviors;
 using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Infra;
 using FCG.Catalog.Infra.Queries;
+using FCG.Catalog.Infra.Rabbitmq.Consumers;
 using FluentValidation;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -22,6 +25,26 @@ builder.Services.AddOpenApi();
 // Configuração do DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FcgCatalogDbContext>(options => options.UseSqlServer(connectionString));
+
+// Configuração do MassTransit com RabbitMQ
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<PaymentProcessedConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(
+            builder.Configuration["RabbitMQ:Host"],
+            builder.Configuration["RabbitMQ:VirtualHost"],
+            h =>
+            {
+                h.Username(builder.Configuration["RabbitMQ:Username"!]);
+                h.Password(builder.Configuration["RabbitMQ:Password"]);
+            });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 
 
@@ -43,6 +66,9 @@ builder.Services.AddValidatorsFromAssembly(typeof(CadastrarJogoValidator).Assemb
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AdicionarJogoHandler).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(AdicionarJogoValidator).Assembly);
 
+//OrdemCompra
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CriarOrdemCompraHandler).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(CriarOrdemCompraValidator).Assembly);
 #endregion
 
 

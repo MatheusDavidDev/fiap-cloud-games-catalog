@@ -13,6 +13,7 @@ public class FcgCatalogDbContext : DbContext
     public DbSet<JogoBiblioteca> JogosBiblioteca { get; set; }
     public DbSet<Jogo> Jogos { get; set; }
     public DbSet<Categoria> Categorias { get; set; }
+    public DbSet<OrdemCompra> OrdensCompra { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

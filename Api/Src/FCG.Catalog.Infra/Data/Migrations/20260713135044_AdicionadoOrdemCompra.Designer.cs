@@ -4,6 +4,7 @@ using FCG.Catalog.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FCG.Catalog.Infra.Data.Migrations
 {
     [DbContext(typeof(FcgCatalogDbContext))]
-    partial class FcgCatalogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260713135044_AdicionadoOrdemCompra")]
+    partial class AdicionadoOrdemCompra
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

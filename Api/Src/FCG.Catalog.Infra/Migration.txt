@@ -1,1 +1,2 @@
 ﻿01 - Add-Migration Init -context FcgCatalogDbContext -output Data/Migrations
+02 - Add-Migration AdicionadoOrdemCompra -context FcgCatalogDbContext -output Data/Migrations
