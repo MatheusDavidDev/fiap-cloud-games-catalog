@@ -1,0 +1,1 @@
+﻿01 - Add-Migration Init -context FcgCatalogDbContext -output Data/Migrations
