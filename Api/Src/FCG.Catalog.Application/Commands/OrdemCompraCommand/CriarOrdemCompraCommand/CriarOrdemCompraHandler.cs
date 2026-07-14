@@ -21,27 +21,29 @@ public class CriarOrdemCompraHandler : IRequestHandler<CriarOrdemCompraCommand>
     {
         var bibliotecaRepository = _unitOfWork.GetRepository<Biblioteca>();
         var jogoRepository = _unitOfWork.GetRepository<Jogo>();
+        var ordemCompraRepository = _unitOfWork.GetRepository<OrdemCompra>();
+
+        var jogo = await jogoRepository.GetByAsync(predicate: x => x.Id == request.IdJogo, cancellationToken: cancellationToken);
+
+        if (jogo is null)
+            throw new Exception("Jogo não existe.");
 
         var biblioteca = await bibliotecaRepository.GetByAsync(
             predicate: x => x.IdUsuario == request.IdUsuario,
             include: x => x.Include(i => i.JogosBiblioteca), cancellationToken: cancellationToken);
 
-        var jogo = await jogoRepository.GetByAsync(predicate: x => x.Id == request.IdJogo, cancellationToken: cancellationToken);
-
-
         if (biblioteca is null)
         {
             biblioteca = new Biblioteca(request.IdUsuario);
+            await bibliotecaRepository.AddAsync(biblioteca, cancellationToken);
         }
 
         if (biblioteca.JogosBiblioteca.Any(x => x.IdJogo == request.IdJogo))
-            throw new Exception("Jogo já adicionado à biblioteca.");
-
-
-        if (jogo is null)
-            throw new Exception("Jogo não existe.");
+            throw new Exception("O Jogo já foi adicionado à biblioteca anteriormente.");
 
         var ordemCompra = new OrdemCompra(request.IdUsuario, jogo.Id, jogo.Preco);
+
+        await ordemCompraRepository.AddAsync(ordemCompra, cancellationToken);
 
         await _unitOfWork.SaveChanges();
 

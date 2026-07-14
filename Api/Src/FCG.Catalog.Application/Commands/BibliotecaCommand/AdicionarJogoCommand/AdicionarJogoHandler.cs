@@ -1,8 +1,6 @@
 ﻿using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Domain.Entities;
-using FCG.Contracts;
 using MassTransit;
-using MassTransit.Transports;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,22 +9,18 @@ namespace FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoComman
 public class AdicionarJogoHandler : IRequestHandler<AdicionarJogoCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IPublishEndpoint _publishEndpoint;
 
-    public AdicionarJogoHandler(IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint)
+    public AdicionarJogoHandler(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _publishEndpoint = publishEndpoint;
+
     }
 
     public async Task Handle(AdicionarJogoCommand request, CancellationToken cancellationToken)
     {
         var bibliotecaRepository = _unitOfWork.GetRepository<Biblioteca>();
         var jogoRepository = _unitOfWork.GetRepository<Jogo>();
-        var ordemCompraRepository = _unitOfWork.GetRepository<OrdemCompra>();
-
-        var ordemCompra = await ordemCompraRepository.GetByAsync(
-            predicate: x => x.Id == request.IdOrdemCompra, cancellationToken: cancellationToken);
+        var jogoBibliotecaRepository = _unitOfWork.GetRepository<JogoBiblioteca>();
 
         var biblioteca = await bibliotecaRepository.GetByAsync(
             predicate: x => x.IdUsuario == request.IdUsuario, 
@@ -41,6 +35,8 @@ public class AdicionarJogoHandler : IRequestHandler<AdicionarJogoCommand>
             throw new Exception("Jogo não existe.");
 
         var jogoBiblioteca = new JogoBiblioteca(jogo.Id, biblioteca.Id);
+
+        await jogoBibliotecaRepository.AddAsync(jogoBiblioteca, cancellationToken);
 
         await _unitOfWork.SaveChanges();
 

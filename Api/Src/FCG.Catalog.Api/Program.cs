@@ -1,3 +1,4 @@
+﻿using FCG.Catalog.Api.Erros;
 using FCG.Catalog.Api.Middlewares;
 using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
 using FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
@@ -12,23 +13,60 @@ using FluentValidation;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("Chave JWT não configurada.");
 
+var keyBytes = Encoding.ASCII.GetBytes(jwtKey);
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+
+            ValidateIssuer = false,
+            ValidateAudience = false,
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+
+// Configuração do Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Configura��o do DbContext
+// Configuração do DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FcgCatalogDbContext>(options => options.UseSqlServer(connectionString));
 
-// Configura��o do MassTransit com RabbitMQ
+// Configuração do MassTransit com RabbitMQ
 builder.Services.AddMassTransit(x =>
 {
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
+
     x.AddConsumer<PaymentProcessedConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
@@ -46,10 +84,9 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-
-
 #region DI
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<FcgCatalogDbContext>>();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 // Query Services
@@ -89,11 +126,13 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
-app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

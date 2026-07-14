@@ -2,12 +2,13 @@
 using FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
 using FCG.Catalog.Application.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FCG.Catalog.Api.Controllers;
 
 [ApiController]
-[Route("Jogos")]
+[Route("api/jogos")]
 public class JogoController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -18,7 +19,8 @@ public class JogoController : ControllerBase
         _mediator = mediator;
         _queryService = queryService;
     }
-    //[Authorize(Roles = "Admin")]
+
+    [Authorize(Roles = "Admin")]
     [HttpPost("cadastrar-jogo")]
     public async Task<IActionResult> Cadastrar(CadastrarJogoModel model)
     {
@@ -26,7 +28,7 @@ public class JogoController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> JogoPorId(Guid id)
     {
         var result = await _queryService.ObterJogoPorIdAsync(id, CancellationToken.None);

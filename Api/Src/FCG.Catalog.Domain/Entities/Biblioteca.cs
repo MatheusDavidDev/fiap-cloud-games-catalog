@@ -7,6 +7,7 @@ public class Biblioteca : BaseEntity
     public Biblioteca(Guid idUsuario)
     {
         IdUsuario = idUsuario;
+        JogosBiblioteca = new List<JogoBiblioteca>();
     }
 
     public Guid IdUsuario { get; private set; }

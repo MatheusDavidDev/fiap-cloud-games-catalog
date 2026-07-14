@@ -1,11 +1,12 @@
 ﻿using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
-using FCG.Catalog.Application.Commands.OrdemCompraCommand.CriarOrdemCompraCommand;
 using FCG.Catalog.Application.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FCG.Catalog.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/bibliotecas")]
 public class BibliotecaController : ControllerBase
@@ -19,10 +20,11 @@ public class BibliotecaController : ControllerBase
         _queryService = queryService;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("{id}")]
     public async Task<IActionResult> AdicionarJogo(Guid id, Guid idJogo)
     {
-        await _mediator.Send(new CriarOrdemCompraCommand(id, idJogo));
+        await _mediator.Send(new AdicionarJogoCommand(id, idJogo));
         return NoContent();
     }
 
