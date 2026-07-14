@@ -39,7 +39,7 @@ public class PaymentProcessedConsumer : IConsumer<PaymentProcessedEvent>
             ordem.Aprovar();
             deveAdicionarJogo = true; 
         }
-        else if (pagamento.Status == "Rejeitada")
+        else if (pagamento.Status == "Rejeitado")
         {
             ordem.Rejeitar();
         }

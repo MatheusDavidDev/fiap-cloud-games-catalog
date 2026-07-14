@@ -12,8 +12,10 @@ using FCG.Catalog.Infra.Rabbitmq.Consumers;
 using FluentValidation;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
@@ -24,6 +26,7 @@ var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Chave JWT não configurada.");
 
 var keyBytes = Encoding.ASCII.GetBytes(jwtKey);
+
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
@@ -56,7 +59,42 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        var esquemaSeguranca = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = JwtBearerDefaults.AuthenticationScheme,
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Name = "Authorization",
+            Description = "Cole aqui apenas o seu hash JWT gerado no login."
+        };
+
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes.Add("Bearer", esquemaSeguranca);
+
+        var requisitoSeguranca = new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        };
+
+        document.SecurityRequirements = new List<OpenApiSecurityRequirement> { requisitoSeguranca };
+        return Task.CompletedTask;
+    });
+});
 
 // Configuração do DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

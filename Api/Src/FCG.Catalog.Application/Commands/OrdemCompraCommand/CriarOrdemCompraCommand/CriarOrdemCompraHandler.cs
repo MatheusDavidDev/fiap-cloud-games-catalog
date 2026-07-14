@@ -1,5 +1,6 @@
 ﻿using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Domain.Entities;
+using FCG.Catalog.Domain.Enuns;
 using FCG.Contracts;
 using MassTransit;
 using MediatR;
@@ -27,6 +28,12 @@ public class CriarOrdemCompraHandler : IRequestHandler<CriarOrdemCompraCommand>
 
         if (jogo is null)
             throw new Exception("Jogo não existe.");
+
+        var existeOrdem = await ordemCompraRepository.GetByAsync(
+            predicate: x => x.IdJogo == request.IdJogo && x.IdUsuario == request.IdUsuario, cancellationToken: cancellationToken);
+
+        if (existeOrdem is not null && existeOrdem.Status == StatusOrdemCompra.Pendente)
+            throw new Exception("Já existe uma ordem de compra pendente para este jogo.");
 
         var biblioteca = await bibliotecaRepository.GetByAsync(
             predicate: x => x.IdUsuario == request.IdUsuario,
