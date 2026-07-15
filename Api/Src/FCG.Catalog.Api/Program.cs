@@ -152,18 +152,23 @@ builder.Services.AddValidatorsFromAssembly(typeof(CriarOrdemCompraValidator).Ass
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.MapOpenApi();
+//    app.MapScalarApiReference();
+//}
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<FcgCatalogDbContext>();
-    db.Database.Migrate();
-}
+app.MapOpenApi();
+app.MapScalarApiReference();
 
+if (System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<FcgCatalogDbContext>();
+        db.Database.Migrate();
+    }
+}
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseExceptionHandler();

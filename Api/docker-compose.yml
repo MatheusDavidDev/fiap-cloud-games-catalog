@@ -1,0 +1,75 @@
+version: "3.9"
+
+name: "fgc-catalog-docker"
+services:
+
+  catalog-db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+
+    container_name: fcg-catalog-sql-db
+    ports:
+      - "1433:1433"
+
+    deploy:
+      resources:
+        limits:
+          memory: 1500M     
+        reservations:
+          memory: 1000M
+
+    environment:
+      SA_PASSWORD: "Sql@123456789"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+
+    volumes:
+      - catalog-data:/var/opt/mssql
+      
+    restart: unless-stopped
+
+    networks:
+      - fcg-network
+
+  catalog-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: fcg-catalog-api
+
+    ports:
+      - "5002:8080"
+
+    depends_on:
+      - catalog-db
+
+    deploy:
+      resources:
+        limits:
+          memory: 512M      
+        reservations:
+          memory: 256M 
+
+    environment:
+      #ConnectionStrings
+      ConnectionStrings__DefaultConnection: "Server=catalog-db;Database=Catalogo;User Id=sa;Password=Sql@123456789;TrustServerCertificate=True"
+
+      #JWT
+      Jwt__Key: "uma-chave-grande-e-secreta-para-jwt"
+
+      # RabbitMQ
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__VirtualHost: "/"
+      RabbitMQ__Username: "fcgrabbtmq"
+      RabbitMQ__Password: "fcgrabbtmq"
+
+    networks:
+      - fcg-network
+
+volumes:
+  catalog-data:
+
+
+networks:
+  fcg-network:
+    external: true
