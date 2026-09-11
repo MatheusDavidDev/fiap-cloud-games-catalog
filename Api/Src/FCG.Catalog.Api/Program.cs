@@ -158,8 +158,12 @@ var app = builder.Build();
 //    app.MapScalarApiReference();
 //}
 
-app.MapOpenApi();
-app.MapScalarApiReference();
+app.MapOpenApi("/catalog-scalar/openapi.json");
+app.MapScalarApiReference("/catalog-scalar", options =>
+{
+    options.WithOpenApiRoutePattern("/catalog-scalar/openapi.json");
+    options.Title = "FCG Catalog API";
+});
 
 if (System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider")
 {
