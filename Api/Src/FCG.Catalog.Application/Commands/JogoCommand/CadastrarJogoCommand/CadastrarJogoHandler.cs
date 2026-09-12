@@ -1,4 +1,5 @@
-﻿using FCG.Catalog.Core.UnitOfWork;
+﻿using FCG.Catalog.Application.Cache;
+using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Domain.Entities;
 using MediatR;
 
@@ -7,10 +8,12 @@ namespace FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
 public class CadastrarJogoHandler : IRequestHandler<CadastrarJogoCommand>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
 
-    public CadastrarJogoHandler(IUnitOfWork unitOfWork)
+    public CadastrarJogoHandler(IUnitOfWork unitOfWork, ICacheService cache)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cache;
     }
 
     public async Task Handle(CadastrarJogoCommand request, CancellationToken cancellationToken)
@@ -26,5 +29,7 @@ public class CadastrarJogoHandler : IRequestHandler<CadastrarJogoCommand>
         await jogoRepository.AddAsync(jogo, cancellationToken);
 
         await _unitOfWork.SaveChanges();
+
+        await _cacheService.RemoveAsync(CacheKeys.TodosJogos, cancellationToken);
     }
 }

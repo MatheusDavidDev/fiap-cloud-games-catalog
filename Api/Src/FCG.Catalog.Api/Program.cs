@@ -1,5 +1,6 @@
 ﻿using FCG.Catalog.Api.Erros;
 using FCG.Catalog.Api.Middlewares;
+using FCG.Catalog.Application.Cache;
 using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
 using FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
 using FCG.Catalog.Application.Commands.OrdemCompraCommand.CriarOrdemCompraCommand;
@@ -7,6 +8,7 @@ using FCG.Catalog.Application.Queries;
 using FCG.Catalog.Core.Behaviors;
 using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Infra;
+using FCG.Catalog.Infra.CacheService;
 using FCG.Catalog.Infra.Queries;
 using FCG.Catalog.Infra.Rabbitmq.Consumers;
 using FluentValidation;
@@ -42,7 +44,6 @@ builder.Services.AddAuthentication("Bearer")
             ClockSkew = TimeSpan.Zero
         };
     });
-
 
 // Configuração do Serilog
 Log.Logger = new LoggerConfiguration()
@@ -96,9 +97,20 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+#region SERVIÇOS
+
 // Configuração do DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<FcgCatalogDbContext>(options => options.UseSqlServer(connectionString));
+
+// Configuração do Redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration =
+        builder.Configuration["Redis:ConnectionString"];
+
+    options.InstanceName = "fcg-catalog:";
+});
 
 // Configuração do MassTransit com RabbitMQ
 builder.Services.AddMassTransit(x =>
@@ -122,10 +134,14 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+#endregion
+
 #region DI
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork<FcgCatalogDbContext>>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork<FcgCatalogDbContext>>();
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
 // Query Services
 builder.Services.AddScoped<IJogoQueryService, JogoQueryService>();
@@ -147,7 +163,6 @@ builder.Services.AddValidatorsFromAssembly(typeof(AdicionarJogoValidator).Assemb
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CriarOrdemCompraHandler).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(CriarOrdemCompraValidator).Assembly);
 #endregion
-
 
 var app = builder.Build();
 

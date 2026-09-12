@@ -12,3 +12,6 @@ data:
   RabbitMQ__VirtualHost: "/"
 
   ASPNETCORE_ENVIRONMENT: "Development"
+
+  Redis__ConnectionString: "catalog-redis:6379"
+
