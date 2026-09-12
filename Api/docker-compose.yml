@@ -64,6 +64,8 @@ services:
 
      depends_on:
        - catalog-db
+       - catalog-redis
+       - rabbitmq
 
      deploy:
        resources:
