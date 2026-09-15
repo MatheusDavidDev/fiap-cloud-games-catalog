@@ -115,19 +115,22 @@ builder.Services.AddStackExchangeRedisCache(options =>
 // Configuração do MassTransit com RabbitMQ
 builder.Services.AddMassTransit(x =>
 {
-    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
-
     x.AddConsumer<PaymentProcessedConsumer>();
-
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(
             builder.Configuration["RabbitMQ:Host"],
+            5671,
             builder.Configuration["RabbitMQ:VirtualHost"],
             h =>
             {
-                h.Username(builder.Configuration["RabbitMQ:Username"!]);
+                h.Username(builder.Configuration["RabbitMQ:Username"]);
                 h.Password(builder.Configuration["RabbitMQ:Password"]);
+
+                h.UseSsl(s =>
+                {
+                    s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
+                });
             });
 
         cfg.ConfigureEndpoints(context);
