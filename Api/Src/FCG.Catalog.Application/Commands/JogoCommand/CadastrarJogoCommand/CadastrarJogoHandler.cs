@@ -11,12 +11,15 @@ public class CadastrarJogoHandler : IRequestHandler<CadastrarJogoCommand>
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICacheService _cacheService;
     private readonly IJogoDetalhesRepository _jogoDetalhesRepository;
+    private readonly IJogoSearchService _jogoSearchService;
 
-    public CadastrarJogoHandler(IUnitOfWork unitOfWork, ICacheService cache, IJogoDetalhesRepository jogoDetalhesRepository)
+    public CadastrarJogoHandler(IUnitOfWork unitOfWork, ICacheService cache, 
+        IJogoDetalhesRepository jogoDetalhesRepository, IJogoSearchService jogoSearchService)
     {
         _unitOfWork = unitOfWork;
         _cacheService = cache;
         _jogoDetalhesRepository = jogoDetalhesRepository;
+        _jogoSearchService = jogoSearchService;
     }
 
     public async Task Handle(CadastrarJogoCommand request, CancellationToken cancellationToken)
@@ -40,5 +43,8 @@ public class CadastrarJogoHandler : IRequestHandler<CadastrarJogoCommand>
         // Salvar no MongoDB
         await _jogoDetalhesRepository.SalvarAsync(jogo.Id, request.Descricao, request.Desenvolvedora, request.Generos, 
             request.Plataformas, request.RequisitosMinimos, cancellationToken);
+
+        await _jogoSearchService.IndexarJogoAsync(jogo.Id, jogo.Nome, jogo.Preco, jogo.IdCategoria,
+                request.Descricao, request.Desenvolvedora, request.Generos, request.Plataformas, cancellationToken);
     }
 }

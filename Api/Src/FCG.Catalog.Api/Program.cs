@@ -2,6 +2,7 @@
 using FCG.Catalog.Api.Middlewares;
 using FCG.Catalog.Application.Cache;
 using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
+using FCG.Catalog.Application.Commands.JogoCommand.AtualizarJogoCommand;
 using FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
 using FCG.Catalog.Application.Commands.OrdemCompraCommand.CriarOrdemCompraCommand;
 using FCG.Catalog.Application.Interfaces;
@@ -11,6 +12,7 @@ using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Infra;
 using FCG.Catalog.Infra.CacheService;
 using FCG.Catalog.Infra.MongoDb.Repositories;
+using FCG.Catalog.Infra.OpenSearch.Services;
 using FCG.Catalog.Infra.Queries;
 using FCG.Catalog.Infra.Rabbitmq.Consumers;
 using FluentValidation;
@@ -21,6 +23,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using OpenSearch.Client;
 using Prometheus;
 using Scalar.AspNetCore;
 using Serilog;
@@ -116,6 +119,18 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "fcg-catalog:";
 });
 
+// Configuração do OpenSearch
+var openSearchUrl = builder.Configuration["OpenSearch:Url"]
+    ?? throw new InvalidOperationException("OpenSearch:Url não configurada.");
+
+builder.Services.AddSingleton<IOpenSearchClient>(_ =>
+{
+    var settings = new ConnectionSettings(new Uri(openSearchUrl))
+        .DefaultIndex("jogos");
+
+    return new OpenSearchClient(settings);
+});
+
 // Configuração do MongoDB
 var mongoConnectionString = builder.Configuration["MongoDb:ConnectionString"]
     ?? throw new InvalidOperationException(
@@ -168,6 +183,7 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<FcgCatalogDbContext>>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<IJogoDetalhesRepository, JogoDetalhesRepository>();
+builder.Services.AddScoped<IJogoSearchService, JogoSearchService>();
 
 // Query Services
 builder.Services.AddScoped<IJogoQueryService, JogoQueryService>();
@@ -180,6 +196,9 @@ builder.Services.AddScoped<IBibliotecaQueryService, BibliotecaQueryService>();
 //Jogo
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CadastrarJogoHandler).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(CadastrarJogoValidator).Assembly);
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AtualizarJogoHandler).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(AtualizarJogoValidator).Assembly);
 
 //Biblioteca
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AdicionarJogoHandler).Assembly));

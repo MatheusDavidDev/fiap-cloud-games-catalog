@@ -65,6 +65,7 @@ services:
        - catalog-redis
        - rabbitmq
        - mongodb
+       - opensearch
 
      deploy:
        resources:
@@ -95,6 +96,9 @@ services:
 
         # REDIS
         Redis__ConnectionString: "catalog-redis:6379"
+
+        #OPENSEARCH
+        OpenSearch__Url: "http://opensearch:9200"
 
      networks:
        - fcg-network
@@ -127,9 +131,31 @@ services:
     networks:
       - fcg-network
 
+  opensearch:
+    image: opensearchproject/opensearch:2.19.4
+    container_name: fcg-catalog-opensearch
+
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+
+    ports:
+      - "9200:9200"
+
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+    networks:
+      - fcg-network
+
+    restart: unless-stopped
+
 volumes:
   catalog-data:
   mongodb-data:
+  opensearch-data:
 
 
 networks:

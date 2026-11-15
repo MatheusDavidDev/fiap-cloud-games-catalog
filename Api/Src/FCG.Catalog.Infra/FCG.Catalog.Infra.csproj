@@ -24,6 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MongoDB.Driver" Version="3.10.0" />
+    <PackageReference Include="OpenSearch.Client" Version="2.3.0" />
   </ItemGroup>
 
   <PropertyGroup>

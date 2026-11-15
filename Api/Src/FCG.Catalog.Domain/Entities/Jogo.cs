@@ -17,4 +17,11 @@ public class Jogo : BaseEntity
     public Categoria Categoria { get; private set; }
     public ICollection<JogoBiblioteca> JogoBibliotecas { get; private set; }
 
+    public void Atualizar(string nome, decimal preco, Guid? idCategoria)
+    {
+        Nome = nome;
+        Preco = preco;
+        IdCategoria = idCategoria;
+    }
+
 }
