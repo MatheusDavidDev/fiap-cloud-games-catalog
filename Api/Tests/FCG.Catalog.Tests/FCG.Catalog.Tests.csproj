@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FCG.Catalog.Domain\FCG.Catalog.Domain.csproj" />
+    <ProjectReference Include="..\..\Src\FCG.Catalog.Domain\FCG.Catalog.Domain.csproj" />
   </ItemGroup>
 
 </Project>
