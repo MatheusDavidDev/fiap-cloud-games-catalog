@@ -4,11 +4,13 @@ using FCG.Catalog.Application.Cache;
 using FCG.Catalog.Application.Commands.BibliotecaCommand.AdicionarJogoCommand;
 using FCG.Catalog.Application.Commands.JogoCommand.CadastrarJogoCommand;
 using FCG.Catalog.Application.Commands.OrdemCompraCommand.CriarOrdemCompraCommand;
+using FCG.Catalog.Application.Interfaces;
 using FCG.Catalog.Application.Queries;
 using FCG.Catalog.Core.Behaviors;
 using FCG.Catalog.Core.UnitOfWork;
 using FCG.Catalog.Infra;
 using FCG.Catalog.Infra.CacheService;
+using FCG.Catalog.Infra.MongoDb.Repositories;
 using FCG.Catalog.Infra.Queries;
 using FCG.Catalog.Infra.Rabbitmq.Consumers;
 using FluentValidation;
@@ -18,6 +20,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using Prometheus;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
@@ -112,6 +116,24 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "fcg-catalog:";
 });
 
+// Configuração do MongoDB
+var mongoConnectionString = builder.Configuration["MongoDb:ConnectionString"]
+    ?? throw new InvalidOperationException(
+        "MongoDb:ConnectionString não configurada.");
+
+var mongoDatabaseName = builder.Configuration["MongoDb:DatabaseName"]
+    ?? throw new InvalidOperationException(
+        "MongoDb:DatabaseName não configurado.");
+
+builder.Services.AddSingleton<IMongoClient>(
+    _ => new MongoClient(mongoConnectionString));
+
+builder.Services.AddSingleton<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(mongoDatabaseName);
+});
+
 // Configuração do MassTransit com RabbitMQ
 builder.Services.AddMassTransit(x =>
 {
@@ -145,6 +167,7 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork<FcgCatalogDbContext>>();
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
+builder.Services.AddScoped<IJogoDetalhesRepository, JogoDetalhesRepository>();
 
 // Query Services
 builder.Services.AddScoped<IJogoQueryService, JogoQueryService>();
@@ -195,9 +218,14 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseExceptionHandler();
 
-app.UseHttpsRedirection();
+// Add Prometheus metrics middleware
+app.UseHttpMetrics();
+
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.MapMetrics();
 
 app.MapControllers();
 

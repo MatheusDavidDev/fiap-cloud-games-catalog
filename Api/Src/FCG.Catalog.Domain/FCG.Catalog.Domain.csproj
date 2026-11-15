@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FCG.Catalog.Core\FCG.Catalog.Core.csproj" />
-    <ProjectReference Include="..\FCG.Users.Core\FCG.Catalog.Core.csproj" />
   </ItemGroup>
 
 </Project>
