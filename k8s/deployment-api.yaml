@@ -12,7 +12,6 @@ spec:
       app: catalog-api
 
   template:
-
     metadata:
       labels:
         app: catalog-api
@@ -22,37 +21,26 @@ spec:
         prometheus.io/path: "/metrics"
 
     spec:
-
       containers:
+        - name: catalog-api
+          image: catalog-api:latest
+          imagePullPolicy: IfNotPresent
 
-      - name: catalog-api
+          ports:
+            - containerPort: 8080
 
-        image: catalog-api:latest
+          resources:
+            limits:
+              memory: "512Mi"
+            requests:
+              memory: "256Mi"
 
-        imagePullPolicy: IfNotPresent 
+          envFrom:
+            - configMapRef:
+                name: catalog-config
 
-        ports:
-        - containerPort: 8080
+            - secretRef:
+                name: catalog-secret
 
-
-        resources:
-
-          limits:
-            memory: "512Mi"
-
-          requests:
-            memory: "256Mi"
-
-
-        envFrom:
-
-        - configMapRef:
-            name: catalog-config
-            
-        - configMapRef:
-            name: catalog-config
-
-        - secretRef:
-            name: catalog-secret
-
- 
+            - secretRef:
+                name: catalog-mongodb-secret

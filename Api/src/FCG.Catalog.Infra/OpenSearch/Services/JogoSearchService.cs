@@ -67,7 +67,8 @@ public class JogoSearchService : IJogoSearchService
                         .Type(TextQueryType.BestFields)
                         .Fuzziness(Fuzziness.Auto)
                     )
-                ),
+                )
+                .Sort(sort => sort.Descending(SortSpecialField.Score)),
             cancellationToken);
 
         if (!response.IsValid)
