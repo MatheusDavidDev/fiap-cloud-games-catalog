@@ -1,29 +1,29 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Application", "Src\FCG.Catalog.Application\FCG.Catalog.Application.csproj", "{8D1839FA-6508-4D11-B7DA-13818C95A7FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Application", "src\FCG.Catalog.Application\FCG.Catalog.Application.csproj", "{8D1839FA-6508-4D11-B7DA-13818C95A7FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Domain", "Src\FCG.Catalog.Domain\FCG.Catalog.Domain.csproj", "{ACEB2686-96F9-4202-B4B3-9E02F6A313DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Domain", "src\FCG.Catalog.Domain\FCG.Catalog.Domain.csproj", "{ACEB2686-96F9-4202-B4B3-9E02F6A313DE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B74EA22B-F0EC-468C-B6AB-6441D81AB710} = {B74EA22B-F0EC-468C-B6AB-6441D81AB710}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Infra", "Src\FCG.Catalog.Infra\FCG.Catalog.Infra.csproj", "{7B07EF5A-132B-432C-977A-8FE239B67741}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Infra", "src\FCG.Catalog.Infra\FCG.Catalog.Infra.csproj", "{7B07EF5A-132B-432C-977A-8FE239B67741}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8D1839FA-6508-4D11-B7DA-13818C95A7FD} = {8D1839FA-6508-4D11-B7DA-13818C95A7FD}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Api", "Src\FCG.Catalog.Api\FCG.Catalog.Api.csproj", "{42AA7608-9D01-4BBA-A520-BEA26967C46A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Api", "src\FCG.Catalog.Api\FCG.Catalog.Api.csproj", "{42AA7608-9D01-4BBA-A520-BEA26967C46A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8D1839FA-6508-4D11-B7DA-13818C95A7FD} = {8D1839FA-6508-4D11-B7DA-13818C95A7FD}
 		{B74EA22B-F0EC-468C-B6AB-6441D81AB710} = {B74EA22B-F0EC-468C-B6AB-6441D81AB710}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Core", "Src\FCG.Catalog.Core\FCG.Catalog.Core.csproj", "{B74EA22B-F0EC-468C-B6AB-6441D81AB710}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Core", "src\FCG.Catalog.Core\FCG.Catalog.Core.csproj", "{B74EA22B-F0EC-468C-B6AB-6441D81AB710}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6C4D298B-81FB-2B6B-5AB6-46205EDDC72C}"
 EndProject
@@ -31,7 +31,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Contracts", "libs\FCG.C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Tests", "Tests\FCG.Catalog.Tests\FCG.Catalog.Tests.csproj", "{BC8F7E48-81EC-45E9-BFF3-0D0797E6B01D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCG.Catalog.Tests", "tests\FCG.Catalog.Tests\FCG.Catalog.Tests.csproj", "{BC8F7E48-81EC-45E9-BFF3-0D0797E6B01D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
