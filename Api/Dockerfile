@@ -8,6 +8,7 @@ RUN dotnet restore FCG.Catalog.sln
 
 RUN dotnet publish src/FCG.Catalog.Api/FCG.Catalog.Api.csproj \
     -c Release \
+    --no-restore \
     -o /app/publish
 
 
