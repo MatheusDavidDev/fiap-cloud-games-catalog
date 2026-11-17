@@ -44,6 +44,10 @@ public class AtualizarJogoHandler : IRequestHandler<AtualizarJogoCommand>
             CacheKeys.TodosJogos,
             cancellationToken);
 
+        await _cacheService.RemoveAsync(
+            CacheKeys.Jogo(request.Id),
+            cancellationToken);
+
         // Atualizar MongoDB
         await _jogoDetalhesRepository.SalvarAsync(
             jogo.Id,

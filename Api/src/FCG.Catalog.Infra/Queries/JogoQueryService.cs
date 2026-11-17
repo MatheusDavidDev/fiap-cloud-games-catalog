@@ -40,7 +40,7 @@ public class JogoQueryService : IJogoQueryService
         };
 
         // Salva os dados da consulta no cache para futuras requisições
-        await _cache.SetAsync(cacheKey, jogo, TimeSpan.FromMinutes(10),cancellationToken);
+        await _cache.SetAsync(cacheKey, result, TimeSpan.FromMinutes(10), cancellationToken);
 
         return result;
     }
