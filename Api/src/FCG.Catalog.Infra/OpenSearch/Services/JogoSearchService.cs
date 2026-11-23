@@ -55,19 +55,26 @@ public class JogoSearchService : IJogoSearchService
             s => s
                 .Index("jogos")
                 .Size(20)
-                .Query(q => q
-                    .MultiMatch(m => m
-                        .Query(pesquisa)
-                        .Fields(f => f
-                            .Field(x => x.Nome, 3.0)
-                            .Field(x => x.Descricao)
-                            .Field(x => x.Desenvolvedora)
-                            .Field(x => x.Generos)
-                        )
-                        .Type(TextQueryType.BestFields)
-                        .Fuzziness(Fuzziness.Auto)
-                    )
-                )
+                .Query(x => x
+                    .Bool(x => x
+                        .Should(
+                            s => s.Match(m => m
+                                .Field(x => x.Nome)
+                                .Query(pesquisa)
+                                .Operator(Operator.And)
+                                .Boost(10)),
+                            s => s.MultiMatch(m => m
+                                .Query(pesquisa)
+                                .Fields(f => f
+                                    .Field(x => x.Nome, 3.0)
+                                    .Field(x => x.Descricao)
+                                    .Field(x => x.Desenvolvedora)
+                                    .Field(x => x.Generos)
+                                )
+                                .Type(TextQueryType.BestFields)
+                                .Fuzziness(Fuzziness.Auto)
+                            )
+                        ).MinimumShouldMatch(1)))
                 .Sort(sort => sort.Descending(SortSpecialField.Score)),
             cancellationToken);
 
